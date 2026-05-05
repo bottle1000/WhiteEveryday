@@ -1,0 +1,31 @@
+spring:
+  application:
+    name: WhiteEveryday
+  profiles:
+    default: local
+  datasource:
+    url: ${SPRING_DATASOURCE_URL:jdbc:mysql://localhost:3307/white_everyday?serverTimezone=Asia/Seoul&characterEncoding=UTF-8}
+    username: ${SPRING_DATASOURCE_USERNAME:white}
+    password: ${SPRING_DATASOURCE_PASSWORD:white}
+    driver-class-name: com.mysql.cj.jdbc.Driver
+  jpa:
+    hibernate:
+      ddl-auto: validate
+    properties:
+      hibernate:
+        format_sql: true
+        jdbc:
+          time_zone: Asia/Seoul
+    open-in-view: false
+
+server:
+  port: ${SERVER_PORT:8080}
+
+logging:
+  level:
+    org.hibernate.SQL: debug
+
+jwt:
+  secret: ${JWT_SECRET:sdasdkljfsdiavnlkadsfjiewji1223ajidijsdaidddiiff}
+  access-token-validity-ms: ${JWT_ACCESS_TOKEN_VALIDITY_MS:1800000}
+  refresh-token-validity-ms: ${JWT_REFRESH_TOKEN_VALIDITY_MS:1209600000}
