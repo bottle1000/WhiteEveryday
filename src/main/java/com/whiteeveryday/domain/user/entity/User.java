@@ -1,6 +1,8 @@
 package com.whiteeveryday.domain.user.entity;
 
 import com.whiteeveryday.domain.common.BaseEntity;
+import com.whiteeveryday.global.exception.BusinessException;
+import com.whiteeveryday.global.exception.ErrorCode;
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -33,5 +35,9 @@ public class User extends BaseEntity {
         this.password = encodedPassword;
         this.nickname = nickname;
         this.role = Role.ROLE_USER;
+    }
+
+    public void promoteToCompany() {
+        this.role = Role.ROLE_COMPANY;
     }
 }
