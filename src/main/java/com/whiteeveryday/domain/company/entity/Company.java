@@ -31,7 +31,7 @@ public class Company extends BaseEntity {
     private String businessNumber;
 
     @Column(nullable = false, name = "is_active")
-    private boolean isActive;
+    private boolean isActive; // 관리자에게 승인된 기업
 
     @OneToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_id", nullable = false, unique = true)
@@ -45,5 +45,13 @@ public class Company extends BaseEntity {
         this.businessNumber = businessNumber;
         this.isActive = false;
         this.user = user;
+    }
+
+    public void activate() {
+        this.isActive = true;
+    }
+
+    public void deactivate() {
+        this.isActive = false;
     }
 }

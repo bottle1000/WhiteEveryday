@@ -65,4 +65,14 @@ public class CompanyService {
 
         return CheckCompanyResponse.from(company);
     }
+
+    @Transactional
+    public RegisterCompanyResponse approve(Long companyId) {
+        Company company = companyRepository.findById(companyId)
+                .orElseThrow(() -> new BusinessException(ErrorCode.COMPANY_NOT_FOUND));
+
+        company.activate();
+
+        return RegisterCompanyResponse.from(company);
+    }
 }
