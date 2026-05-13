@@ -11,6 +11,7 @@ public enum ErrorCode {
     ALREADY_SIGNUP_USER("이미 가입된 유저입니다.", 409),
     ALREADY_REGISTER_COMPANY("이미 등록된 기업입니다.", 409),
     ALREADY_REGISTER_USER("이미 기업을 가지고 있습니다.", 409),
+    COMPANY_NOT_ACTIVE("승인되지 않은 기업입니다.", 403),
     USER_NOT_FOUND("사용자를 찾을 수 없습니다.", 404),
     COMPANY_NOT_FOUND("기업(회사)를 찾을 수 없습니다.", 404),
     PRODUCT_NOT_FOUND("상품을 찾을 수 없습니다.", 404),
