@@ -92,4 +92,16 @@ public class Product extends BaseEntity {
             this.productStatus = ProductStatus.SOLD_OUT;
         }
     }
+
+    public void addStockQuantity() {
+        this.stockQuantity += 1;
+
+        if (this.initialStockQuantity < this.stockQuantity) {
+            throw new BusinessException(ErrorCode.INVALID_REQUEST);
+        }
+
+        if (this.stockQuantity > 0 && this.productStatus == ProductStatus.SOLD_OUT) {
+            this.productStatus = ProductStatus.ON_SALE;
+        }
+    }
 }
