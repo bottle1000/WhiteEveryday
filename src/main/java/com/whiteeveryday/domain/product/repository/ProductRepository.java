@@ -19,6 +19,13 @@ public interface ProductRepository extends JpaRepository<Product, Long> {
     @Query("""
         select p
         from Product p
+        where p.id = :productId
+        """)
+    Optional<Product> findByProductId(@Param("productId") Long productId);
+
+    @Query("""
+        select p
+        from Product p
         join fetch p.company
         where p.id = :productId
         And p.productStatus in :statuses
