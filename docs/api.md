@@ -274,6 +274,12 @@ Response `200`
 
 권한: USER
 
+정책:
+- 판매 중(`ON_SALE`)인 상품만 주문할 수 있다.
+- 주문 생성 시 재고를 1개 선점하고 주문 상태는 `PENDING`이 된다.
+- 같은 판매일에 `PENDING` 또는 `PAID` 주문이 있으면 추가 주문할 수 없다.
+- `FAILED`, `EXPIRED`, `CANCELLED` 주문은 당일 구매 제한에 포함하지 않는다.
+
 Request
 
 ```json

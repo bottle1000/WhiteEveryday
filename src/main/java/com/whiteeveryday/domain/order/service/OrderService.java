@@ -39,7 +39,10 @@ public class OrderService {
             throw new BusinessException(ErrorCode.SALE_NOT_OPEN);
         }
 
-        if (orderRepository.existsByUserIdAndSaleDate(user.getId(), product.getSaleDate())){
+        if (orderRepository.existsByUserIdAndSaleDate(
+                user.getId(),
+                product.getSaleDate(),
+                List.of(OrderStatus.PENDING, OrderStatus.PAID))){
             throw new BusinessException(ErrorCode.ALREADY_ORDERED_TODAY);
         }
 

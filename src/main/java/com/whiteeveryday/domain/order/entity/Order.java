@@ -13,15 +13,7 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 
 @Entity
-@Table(
-        name = "orders",
-        uniqueConstraints = {
-            @UniqueConstraint(
-                    name = "uk_order_user_sale_date",
-                    columnNames = {"user_id", "sale_date"}
-            )
-        }
-)
+@Table(name = "orders")
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @Getter
 public class Order extends BaseEntity {
