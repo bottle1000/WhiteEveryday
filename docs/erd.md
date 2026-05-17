@@ -74,6 +74,12 @@
 - expired_at (DateTime): 결제 만료 시각
 - paid_at (DateTime): 결제 완료 시각
 
+제약:
+
+- `user_id + sale_date`는 유니크로 두지 않는다.
+- 당일 중복 주문 제한은 `PENDING`, `PAID` 상태만 서버 검증으로 제한한다.
+- `FAILED`, `EXPIRED`, `CANCELLED` 주문이 있으면 같은 판매일에 다시 주문할 수 있다.
+
 ---
 
 ### **5.6 Payment**

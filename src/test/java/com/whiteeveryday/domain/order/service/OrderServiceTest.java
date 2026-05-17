@@ -114,7 +114,11 @@ class OrderServiceTest {
         OrderCreateRequest request = new OrderCreateRequest(product.getId());
         given(userRepository.findById(userDetails.getId())).willReturn(Optional.of(user));
         given(productRepository.findById(request.getProductId())).willReturn(Optional.of(product));
-        given(orderRepository.existsByUserIdAndSaleDate(user.getId(), product.getSaleDate())).willReturn(false);
+        given(orderRepository.existsByUserIdAndSaleDate(
+                user.getId(),
+                product.getSaleDate(),
+                List.of(OrderStatus.PENDING, OrderStatus.PAID)
+        )).willReturn(false);
 
         // when
         OrderCreateResponse result = orderService.orderCreate(userDetails, request);
@@ -161,7 +165,7 @@ class OrderServiceTest {
 
     /**
      * 3. 이미 같은 판매일 주문이 있으면 실패
-     * ◦ existsByUserIdAndSaleDate()가 true
+     * ◦ PENDING 또는 PAID 주문이 있으면 existsByUserIdAndSaleDate()가 true
      * ◦ ALREADY_ORDERED_TODAY
      */
     @Test
@@ -171,7 +175,11 @@ class OrderServiceTest {
         OrderCreateRequest request = new OrderCreateRequest(product.getId());
         given(userRepository.findById(userDetails.getId())).willReturn(Optional.of(user));
         given(productRepository.findById(request.getProductId())).willReturn(Optional.of(product));
-        given(orderRepository.existsByUserIdAndSaleDate(user.getId(), product.getSaleDate())).willReturn(true);
+        given(orderRepository.existsByUserIdAndSaleDate(
+                user.getId(),
+                product.getSaleDate(),
+                List.of(OrderStatus.PENDING, OrderStatus.PAID)
+        )).willReturn(true);
 
         // when & then
         assertThatThrownBy(() -> orderService.orderCreate(userDetails, request))
@@ -195,7 +203,11 @@ class OrderServiceTest {
 
         given(userRepository.findById(userDetails.getId())).willReturn(Optional.of(user));
         given(productRepository.findById(request.getProductId())).willReturn(Optional.of(product));
-        given(orderRepository.existsByUserIdAndSaleDate(user.getId(), product.getSaleDate())).willReturn(false);
+        given(orderRepository.existsByUserIdAndSaleDate(
+                user.getId(),
+                product.getSaleDate(),
+                List.of(OrderStatus.PENDING, OrderStatus.PAID)
+        )).willReturn(false);
 
         // when & then
         assertThatThrownBy(() -> orderService.orderCreate(userDetails, request))
