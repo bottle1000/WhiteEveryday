@@ -88,6 +88,7 @@ class ProductServiceTest {
                 .price(100000)
                 .stockQuantity(3)
                 .description("description")
+                .imageUrl("https://example.com/product.jpg")
                 .saleDate(LocalDate.now())
                 .company(company)
                 .build();
@@ -104,6 +105,7 @@ class ProductServiceTest {
         ProductRegisterRequest request = new ProductRegisterRequest(
                 "productName",
                 "description",
+                "https://example.com/product.jpg",
                 100000,
                 3,
                 LocalDate.now()
@@ -128,6 +130,7 @@ class ProductServiceTest {
 
         assertThat(savedProduct.getName()).isEqualTo("productName");
         assertThat(savedProduct.getDescription()).isEqualTo("description");
+        assertThat(savedProduct.getImageUrl()).isEqualTo("https://example.com/product.jpg");
         assertThat(savedProduct.getPrice()).isEqualTo(100000);
         assertThat(savedProduct.getStockQuantity()).isEqualTo(3);
         assertThat(savedProduct.getInitialStockQuantity()).isEqualTo(3);
@@ -145,6 +148,7 @@ class ProductServiceTest {
         ProductRegisterRequest request = new ProductRegisterRequest(
                 "productName",
                 "description",
+                "https://example.com/product.jpg",
                 100000,
                 3,
                 LocalDate.now()
@@ -167,6 +171,7 @@ class ProductServiceTest {
         ProductRegisterRequest request = new ProductRegisterRequest(
                 "productName",
                 "description",
+                "https://example.com/product.jpg",
                 100000,
                 3,
                 LocalDate.now()
@@ -183,6 +188,41 @@ class ProductServiceTest {
                 .isInstanceOf(BusinessException.class)
                 .extracting("errorCode")
                 .isEqualTo(ErrorCode.ALREADY_REGISTERED_PRODUCT);
+    }
+
+    @Test
+    void 기업_상품_목록_조회_성공() {
+        // given
+        given(companyRepository.findCompanyByUserId(userDetails.getId())).willReturn(Optional.of(company));
+        given(productRepository.findProductsByCompanyId(company.getId())).willReturn(List.of(product));
+
+        // when
+        CompanyProductListResponse result = productService.getCompanyProducts(userDetails);
+
+        // then
+        assertThat(result.getProducts()).hasSize(1);
+        assertThat(result.getProducts().get(0).getProductId()).isEqualTo(product.getId());
+        assertThat(result.getProducts().get(0).getName()).isEqualTo(product.getName());
+        assertThat(result.getProducts().get(0).getImageUrl()).isEqualTo(product.getImageUrl());
+    }
+
+    @Test
+    void 상품_상세_조회_성공() {
+        // given
+        product.openSale();
+        given(productRepository.findProductByIdAndFilterStatus(
+                product.getId(),
+                List.of(ProductStatus.ON_SALE, ProductStatus.APPROVED, ProductStatus.SOLD_OUT, ProductStatus.CLOSED)
+        )).willReturn(Optional.of(product));
+
+        // when
+        ProductDetailResponse result = productService.getDetailProduct(product.getId());
+
+        // then
+        assertThat(result.getProductId()).isEqualTo(product.getId());
+        assertThat(result.getName()).isEqualTo(product.getName());
+        assertThat(result.getImageUrl()).isEqualTo(product.getImageUrl());
+        assertThat(result.getStatus()).isEqualTo(ProductStatus.ON_SALE);
     }
 
     @Test
@@ -335,6 +375,7 @@ class ProductServiceTest {
         assertThat(result.getProducts()).hasSize(1);
         assertThat(result.getProducts().get(0).getStatus()).isEqualTo(ProductStatus.ON_SALE);
         assertThat(result.getProducts().get(0).getName()).isEqualTo("productName");
+        assertThat(result.getProducts().get(0).getImageUrl()).isEqualTo("https://example.com/product.jpg");
     }
 
     /**
@@ -358,6 +399,7 @@ class ProductServiceTest {
         assertThat(result.getProducts()).hasSize(1);
         assertThat(result.getProducts().get(0).getStatus()).isEqualTo(ProductStatus.APPROVED);
         assertThat(result.getProducts().get(0).getName()).isEqualTo("productName");
+        assertThat(result.getProducts().get(0).getImageUrl()).isEqualTo("https://example.com/product.jpg");
 
         verify(productRepository).findProductsBySaleDateAndFilterStatus(saleDate, List.of(ProductStatus.ON_SALE, ProductStatus.APPROVED, ProductStatus.SOLD_OUT, ProductStatus.CLOSED));
     }

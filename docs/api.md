@@ -149,6 +149,7 @@ Request
 {
   "name": "Limited White Hoodie",
   "description": "한정 수량 후드",
+  "imageUrl": "https://example.com/products/hoodie.jpg",
   "price": 59000,
   "stockQuantity": 3,
   "saleDate": "2026-05-10"
@@ -186,6 +187,7 @@ Response `200`
       "companyName": "White Brand",
       "name": "Limited White Hoodie",
       "description": "한정 수량 후드",
+      "imageUrl": "https://example.com/products/hoodie.jpg",
       "price": 59000,
       "stockQuantity": 3,
       "saleDate": "2026-05-10",
@@ -209,6 +211,7 @@ Response `200`
       "productId": 1,
       "companyName": "White Brand",
       "name": "Limited White Hoodie",
+      "imageUrl": "https://example.com/products/hoodie.jpg",
       "price": 59000,
       "stockQuantity": 3,
       "status": "ON_SALE"
@@ -231,6 +234,7 @@ Response `200`
       "productId": 1,
       "companyName": "White Brand",
       "name": "Limited White Hoodie",
+      "imageUrl": "https://example.com/products/hoodie.jpg",
       "price": 59000,
       "stockQuantity": 3,
       "status": "APPROVED"
@@ -252,6 +256,7 @@ Response `200`
   "companyName": "White Brand",
   "name": "Limited White Hoodie",
   "description": "한정 수량 후드",
+  "imageUrl": "https://example.com/products/hoodie.jpg",
   "price": 59000,
   "stockQuantity": 3,
   "saleDate": "2026-05-10",

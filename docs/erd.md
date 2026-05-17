@@ -30,6 +30,7 @@
 - company_id (BigInt, FK): 상품을 등록한 기업. Product는 User가 아니라 Company에 소속
 - name (Varchar): 상품명
 - description (Text): 상품 설명
+- image_url (Varchar, Nullable): 상품 이미지 URL
 - price (Int): 판매 가격
 - stock_quantity (Int): 현재 재고 수량
 - initial_stock_quantity (Int): 최초 등록 재고 수량

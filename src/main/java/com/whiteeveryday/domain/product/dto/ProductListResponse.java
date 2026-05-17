@@ -29,6 +29,7 @@ public class ProductListResponse {
         private Long productId;
         private String companyName;
         private String name;
+        private String imageUrl;
         private Integer price;
         private Integer stockQuantity;
         private ProductStatus status;
@@ -38,6 +39,7 @@ public class ProductListResponse {
             response.productId = product.getId();
             response.companyName = product.getCompany().getName();
             response.name = product.getName();
+            response.imageUrl = product.getImageUrl();
             response.price = product.getPrice();
             response.stockQuantity = product.getStockQuantity();
             response.status = product.getProductStatus();
