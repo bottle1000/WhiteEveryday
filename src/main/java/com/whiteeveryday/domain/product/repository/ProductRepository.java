@@ -55,4 +55,13 @@ public interface ProductRepository extends JpaRepository<Product, Long> {
     List<Product> findProductsBySaleDateAndFilterStatus(
             @Param("saleDate")LocalDate saleDate,
             @Param("statuses")List<ProductStatus> statuses);
+
+    @Query("""
+        select p
+        from Product p
+        join fetch p.company
+        where p.company.id = :companyId
+        order by p.saleDate desc, p.id desc
+        """)
+    List<Product> findProductsByCompanyId(@Param("companyId") Long companyId);
 }

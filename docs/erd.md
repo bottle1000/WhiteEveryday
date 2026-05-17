@@ -14,12 +14,12 @@
 ### **5.2 Company**
 
 - id (BigInt, PK): 기업 식별자
-- user_id (BigInt, FK): 기업 계정과 연결
+- user_id (BigInt, FK, Unique): 기업 계정과 연결. 한 유저는 하나의 기업만 등록 가능
 - name (Varchar): 기업명
 - logo_url (Varchar): 브랜드 이미지
 - description (Text): 기업 상세 설명
-- business_number (Varchar): 사업자등록번호
-- is_active (Boolean): 서비스 이용 가능 여부
+- business_number (Varchar, Unique): 사업자등록번호
+- is_active (Boolean): 서비스 이용 승인 여부. 기업 등록 직후 false, 관리자 승인 후 true
 - created_at / updated_at: 생성 및 수정 시간
 
 ---
@@ -27,7 +27,7 @@
 ### **5.3 Product**
 
 - id (BigInt, PK): 상품 식별자
-- company_id (BigInt, FK): 상품을 등록한 기업
+- company_id (BigInt, FK): 상품을 등록한 기업. Product는 User가 아니라 Company에 소속
 - name (Varchar): 상품명
 - description (Text): 상품 설명
 - price (Int): 판매 가격
@@ -36,6 +36,11 @@
 - sale_date (Date, Index): 판매일
 - status (Enum): READY, APPROVED, REJECTED, ON_SALE, SOLD_OUT, CLOSED
 - created_at / updated_at: 생성 및 수정 시간
+
+권장 제약:
+
+- (company_id, sale_date) Unique: 하나의 기업은 특정 판매일에 상품 1개만 등록 가능
+- Product 등록 시에는 DailySaleSlot을 생성하지 않고, 관리자 상품 승인 시 DailySaleSlot을 생성
 
 ---
 
@@ -48,6 +53,11 @@
 - product_id (BigInt, FK): 판매 상품
 - status (Enum): RESERVED, CANCELLED
 - created_at / updated_at: 생성 및 수정 시간
+
+생성 시점:
+
+- Product 등록 시점이 아니라 관리자 상품 승인 시점에 생성
+- 승인된 상품만 판매일 슬롯을 점유
 
 ---
 
