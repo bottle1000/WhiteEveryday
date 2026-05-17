@@ -1,6 +1,6 @@
 package com.whiteeveryday.domain.product.controller;
 
-import com.whiteeveryday.domain.product.dto.ProductDetailResponse;
+import com.whiteeveryday.domain.product.dto.CompanyProductListResponse;
 import com.whiteeveryday.domain.product.dto.ProductRegisterRequest;
 import com.whiteeveryday.domain.product.dto.ProductRegisterResponse;
 import com.whiteeveryday.domain.product.service.ProductService;
@@ -28,5 +28,13 @@ public class ProductController {
 
         return ResponseEntity.status(HttpStatus.CREATED)
                 .body(register);
+    }
+
+    @GetMapping
+    public ResponseEntity<CompanyProductListResponse> getCompanyProducts(
+            @AuthenticationPrincipal CustomUserDetails userDetails) {
+        CompanyProductListResponse response = productService.getCompanyProducts(userDetails);
+
+        return ResponseEntity.ok(response);
     }
 }

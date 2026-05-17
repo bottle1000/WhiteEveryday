@@ -66,9 +66,23 @@ public class ProductService {
         return ProductRegisterResponse.from(product);
     }
 
+    public CompanyProductListResponse getCompanyProducts(CustomUserDetails userDetails) {
+        Company company = companyRepository.findCompanyByUserId(userDetails.getId())
+                .orElseThrow(() -> new BusinessException(ErrorCode.COMPANY_NOT_FOUND));
+
+        List<Product> products = productRepository.findProductsByCompanyId(company.getId());
+
+        return CompanyProductListResponse.of(products);
+    }
+
     // 상품 상세 조회
     public ProductDetailResponse getDetailProduct(Long productId) {
-        Product product = productRepository.findProductByIdAndFilterStatus(productId, List.of(ProductStatus.READY, ProductStatus.REJECTED))
+        Product product = productRepository.findProductByIdAndFilterStatus(
+                        productId,
+                        List.of(ProductStatus.ON_SALE,
+                                ProductStatus.APPROVED,
+                                ProductStatus.SOLD_OUT,
+                                ProductStatus.CLOSED))
                 .orElseThrow(() -> new BusinessException(ErrorCode.PRODUCT_NOT_FOUND));
 
         return ProductDetailResponse.from(product);

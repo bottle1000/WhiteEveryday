@@ -1,0 +1,351 @@
+<!doctype html>
+<html lang="ko">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>WhiteEveryday Payment Test</title>
+    <script src="https://js.tosspayments.com/v2/standard"></script>
+    <style>
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+            margin: 0;
+            background: #f6f7f9;
+            color: #17191c;
+        }
+
+        main {
+            max-width: 920px;
+            margin: 0 auto;
+            padding: 32px 20px 48px;
+        }
+
+        h1 {
+            font-size: 24px;
+            margin: 0 0 20px;
+        }
+
+        h2 {
+            font-size: 17px;
+            margin: 0 0 14px;
+        }
+
+        section {
+            background: #fff;
+            border: 1px solid #dfe3e8;
+            border-radius: 8px;
+            padding: 18px;
+            margin-bottom: 16px;
+        }
+
+        label {
+            display: block;
+            font-size: 13px;
+            font-weight: 600;
+            margin: 12px 0 6px;
+        }
+
+        input, textarea {
+            width: 100%;
+            box-sizing: border-box;
+            border: 1px solid #c9d0d8;
+            border-radius: 6px;
+            padding: 10px 11px;
+            font-size: 14px;
+            background: #fff;
+        }
+
+        textarea {
+            min-height: 86px;
+            resize: vertical;
+        }
+
+        button {
+            border: 0;
+            border-radius: 6px;
+            background: #17191c;
+            color: #fff;
+            padding: 10px 14px;
+            font-weight: 700;
+            cursor: pointer;
+            margin-top: 14px;
+            margin-right: 8px;
+        }
+
+        button.secondary {
+            background: #4b5563;
+        }
+
+        pre {
+            white-space: pre-wrap;
+            word-break: break-word;
+            background: #111827;
+            color: #e5e7eb;
+            border-radius: 8px;
+            padding: 14px;
+            min-height: 80px;
+        }
+
+        .grid {
+            display: grid;
+            grid-template-columns: repeat(2, minmax(0, 1fr));
+            gap: 14px;
+        }
+
+        @media (max-width: 720px) {
+            .grid {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+<main>
+    <h1>WhiteEveryday Payment Test</h1>
+
+    <section>
+        <h2>1. 기본 설정</h2>
+        <label for="apiBaseUrl">API Base URL</label>
+        <input id="apiBaseUrl" value="http://localhost:8080">
+
+        <label for="accessToken">Access Token</label>
+        <textarea id="accessToken" placeholder="Bearer 없이 JWT accessToken만 붙여넣기"></textarea>
+
+        <label for="clientKey">Toss Client Key</label>
+        <input id="clientKey" placeholder="test_ck_...">
+
+        <label for="customerKey">Customer Key</label>
+        <input id="customerKey">
+    </section>
+
+    <section>
+        <h2>2. 주문 생성</h2>
+        <label for="productId">Product ID</label>
+        <input id="productId" type="number" placeholder="1">
+        <button id="createOrderButton">POST /api/orders</button>
+    </section>
+
+    <section>
+        <h2>3. Toss 결제창 요청</h2>
+        <div class="grid">
+            <div>
+                <label for="orderId">DB Order ID</label>
+                <input id="orderId" type="number">
+            </div>
+            <div>
+                <label for="amount">Amount</label>
+                <input id="amount" type="number">
+            </div>
+        </div>
+        <label for="orderName">Order Name</label>
+        <input id="orderName" value="WhiteEveryday 테스트 주문">
+        <label for="orderIdForPg">Toss Order ID</label>
+        <input id="orderIdForPg">
+        <button id="requestPaymentButton">Toss 결제창 열기</button>
+    </section>
+
+    <section>
+        <h2>4. 결제 승인 / 실패 처리</h2>
+        <div class="grid">
+            <div>
+                <label for="paymentKey">Payment Key</label>
+                <input id="paymentKey">
+            </div>
+            <div>
+                <label for="returnedAmount">Returned Amount</label>
+                <input id="returnedAmount" type="number">
+            </div>
+        </div>
+        <button id="confirmPaymentButton">POST /api/payments/confirm</button>
+
+        <label for="failReason">Fail Reason</label>
+        <input id="failReason" value="USER_CANCELLED">
+        <button id="failPaymentButton" class="secondary">POST /api/payments/fail</button>
+    </section>
+
+    <section>
+        <h2>결과</h2>
+        <pre id="result">ready</pre>
+    </section>
+</main>
+
+<script>
+    const $ = (id) => document.getElementById(id);
+    const result = $("result");
+
+    const storeKeys = [
+        "apiBaseUrl",
+        "accessToken",
+        "clientKey",
+        "customerKey",
+        "productId",
+        "orderId",
+        "amount",
+        "orderName",
+        "orderIdForPg"
+    ];
+
+    function init() {
+        $("customerKey").value = localStorage.getItem("customerKey") || crypto.randomUUID();
+
+        for (const key of storeKeys) {
+            const saved = localStorage.getItem(key);
+            if (saved) {
+                $(key).value = saved;
+            }
+
+            $(key).addEventListener("input", () => {
+                localStorage.setItem(key, $(key).value);
+            });
+        }
+
+        applyRedirectParams();
+    }
+
+    function log(data) {
+        result.textContent = typeof data === "string" ? data : JSON.stringify(data, null, 2);
+    }
+
+    function authHeaders() {
+        const token = $("accessToken").value.trim();
+        return {
+            "Content-Type": "application/json",
+            "Authorization": `Bearer ${token}`
+        };
+    }
+
+    function apiUrl(path) {
+        return $("apiBaseUrl").value.replace(/\/$/, "") + path;
+    }
+
+    async function requestJson(path, body) {
+        const response = await fetch(apiUrl(path), {
+            method: "POST",
+            headers: authHeaders(),
+            body: JSON.stringify(body)
+        });
+
+        const text = await response.text();
+        const data = text ? JSON.parse(text) : null;
+
+        if (!response.ok) {
+            throw data;
+        }
+
+        return data;
+    }
+
+    function applyRedirectParams() {
+        const params = new URLSearchParams(window.location.search);
+
+        if (params.has("paymentKey")) {
+            $("paymentKey").value = params.get("paymentKey");
+            $("orderIdForPg").value = params.get("orderId") || $("orderIdForPg").value;
+            $("returnedAmount").value = params.get("amount") || $("amount").value;
+            $("orderId").value = localStorage.getItem("orderId") || $("orderId").value;
+            localStorage.setItem("orderIdForPg", $("orderIdForPg").value);
+
+            log({
+                redirect: "success",
+                paymentKey: $("paymentKey").value,
+                orderIdForPg: $("orderIdForPg").value,
+                amount: $("returnedAmount").value
+            });
+        }
+
+        if (params.has("code") || params.has("message")) {
+            $("orderId").value = localStorage.getItem("orderId") || $("orderId").value;
+            $("orderIdForPg").value = params.get("orderId") || $("orderIdForPg").value;
+            $("failReason").value = params.get("message") || params.get("code") || "PAYMENT_FAILED";
+
+            log({
+                redirect: "fail",
+                code: params.get("code"),
+                message: params.get("message"),
+                orderIdForPg: $("orderIdForPg").value
+            });
+        }
+    }
+
+    $("createOrderButton").addEventListener("click", async () => {
+        try {
+            const data = await requestJson("/api/orders", {
+                productId: Number($("productId").value)
+            });
+
+            $("orderId").value = data.orderId;
+            $("amount").value = data.totalPrice;
+            $("returnedAmount").value = data.totalPrice;
+            $("orderIdForPg").value = `WHITE_ORDER_${data.orderId}_${Date.now()}`;
+            localStorage.setItem("orderId", $("orderId").value);
+            localStorage.setItem("amount", $("amount").value);
+            localStorage.setItem("orderIdForPg", $("orderIdForPg").value);
+
+            log(data);
+        } catch (error) {
+            log(error);
+        }
+    });
+
+    $("requestPaymentButton").addEventListener("click", async () => {
+        try {
+            const tossPayments = TossPayments($("clientKey").value.trim());
+            const payment = tossPayments.payment({ customerKey: $("customerKey").value.trim() });
+            const currentUrl = window.location.origin + window.location.pathname;
+
+            localStorage.setItem("orderId", $("orderId").value);
+            localStorage.setItem("amount", $("amount").value);
+            localStorage.setItem("orderIdForPg", $("orderIdForPg").value);
+
+            await payment.requestPayment({
+                method: "CARD",
+                amount: {
+                    currency: "KRW",
+                    value: Number($("amount").value)
+                },
+                orderId: $("orderIdForPg").value.trim(),
+                orderName: $("orderName").value.trim(),
+                successUrl: currentUrl,
+                failUrl: currentUrl
+            });
+        } catch (error) {
+            log({
+                message: "Toss 결제창 요청 실패",
+                error
+            });
+        }
+    });
+
+    $("confirmPaymentButton").addEventListener("click", async () => {
+        try {
+            const data = await requestJson("/api/payments/confirm", {
+                orderId: Number($("orderId").value),
+                paymentKey: $("paymentKey").value.trim(),
+                orderIdForPg: $("orderIdForPg").value.trim(),
+                amount: Number($("returnedAmount").value || $("amount").value)
+            });
+
+            log(data);
+        } catch (error) {
+            log(error);
+        }
+    });
+
+    $("failPaymentButton").addEventListener("click", async () => {
+        try {
+            const data = await requestJson("/api/payments/fail", {
+                orderId: Number($("orderId").value),
+                paymentKey: $("paymentKey").value.trim() || null,
+                orderIdForPg: $("orderIdForPg").value.trim() || null,
+                reason: $("failReason").value.trim()
+            });
+
+            log(data);
+        } catch (error) {
+            log(error);
+        }
+    });
+
+    init();
+</script>
+</body>
+</html>
