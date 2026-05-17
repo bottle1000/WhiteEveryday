@@ -21,6 +21,8 @@ public class ProductRegisterRequest {
     @NotBlank(message = "상품 설명 입력은 필수입니다.")
     private String description;
 
+    private String imageUrl;
+
     @NotNull(message = "가격 입력은 필수입니다.")
     @Min(value = 1, message = "가격은 1원 이상이어야 합니다.")
     private Integer price;

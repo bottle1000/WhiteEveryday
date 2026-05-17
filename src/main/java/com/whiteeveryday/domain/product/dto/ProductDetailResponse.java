@@ -14,6 +14,7 @@ public class ProductDetailResponse {
     private String companyName;
     private String name;
     private String description;
+    private String imageUrl;
     private Integer price;
     private Integer stockQuantity;
     private LocalDate saleDate;
@@ -26,6 +27,7 @@ public class ProductDetailResponse {
         response.companyName = product.getCompany().getName();
         response.name = product.getName();
         response.description = product.getDescription();
+        response.imageUrl = product.getImageUrl();
         response.price = product.getPrice();
         response.stockQuantity = product.getStockQuantity();
         response.saleDate = product.getSaleDate();

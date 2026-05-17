@@ -51,6 +51,7 @@ public class ProductService {
         Product product = Product.builder()
                 .name(request.getName())
                 .description(request.getDescription())
+                .imageUrl(request.getImageUrl())
                 .price(request.getPrice())
                 .stockQuantity(request.getStockQuantity())
                 .saleDate(request.getSaleDate())

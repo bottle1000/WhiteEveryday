@@ -36,6 +36,9 @@ public class Product extends BaseEntity {
     @Column(nullable = false, columnDefinition = "TEXT")
     private String description;
 
+    @Column(name = "image_url")
+    private String imageUrl;
+
     @Column(nullable = false)
     private Integer price;
 
@@ -57,9 +60,10 @@ public class Product extends BaseEntity {
     private Company company;
 
     @Builder
-    Product(String name, String description, Integer price, Integer stockQuantity, LocalDate saleDate, Company company) {
+    Product(String name, String description, String imageUrl, Integer price, Integer stockQuantity, LocalDate saleDate, Company company) {
         this.name = name;
         this.description = description;
+        this.imageUrl = imageUrl;
         this.price = price;
         this.stockQuantity = stockQuantity;
         this.initialStockQuantity = stockQuantity;
